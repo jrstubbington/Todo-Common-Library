@@ -11,6 +11,9 @@ import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.ContainerProperties;
+import org.springframework.kafka.support.DefaultKafkaHeaderMapper;
+import org.springframework.kafka.support.KafkaHeaderMapper;
+import org.springframework.kafka.support.converter.MessagingMessageConverter;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 
 import java.util.HashMap;
@@ -43,6 +46,23 @@ public class KafkaConsumerConfig {
 				new JsonDeserializer<>(DtoEntity.class));
 	}
 
+	//Create a new Header mapper to allow custom object headers in Kafka messages.
+	//Allow all packages within the listed packages to be treated as allowable headers
+	@Bean("kafkaBinderHeaderMapper")
+	public KafkaHeaderMapper kafkaBinderHeaderMapper() {
+		DefaultKafkaHeaderMapper mapper = new DefaultKafkaHeaderMapper();
+		mapper.addTrustedPackages("org.example.todo");
+		return mapper;
+	}
+
+	//Create the message converter with the kafkaBinderHeaderMapper
+	@Bean
+	public MessagingMessageConverter messagingMessageConverter() {
+		MessagingMessageConverter messagingMessageConverter = new MessagingMessageConverter();
+		messagingMessageConverter.setHeaderMapper(kafkaBinderHeaderMapper());
+		return messagingMessageConverter;
+	}
+
 	@Bean
 	public <T extends DtoEntity> ConcurrentKafkaListenerContainerFactory<String, T>
 	kafkaListenerContainerFactory() {
@@ -50,6 +70,8 @@ public class KafkaConsumerConfig {
 		ConcurrentKafkaListenerContainerFactory<String, T> factory =
 				new ConcurrentKafkaListenerContainerFactory<>();
 		factory.setConsumerFactory(consumerFactory());
+		//Add the custom message converter to the factory
+		factory.setMessageConverter(messagingMessageConverter());
 		factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL_IMMEDIATE);
 		return factory;
 	}
