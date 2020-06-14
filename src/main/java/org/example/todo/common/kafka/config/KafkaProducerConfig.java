@@ -1,7 +1,6 @@
 package org.example.todo.common.kafka.config;
 
 import org.apache.kafka.clients.producer.ProducerConfig;
-import org.example.todo.common.dto.DtoEntity;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,7 +19,7 @@ public class KafkaProducerConfig {
 	private String bootstrapAddress;
 
 	@Bean
-	public <T extends DtoEntity> ProducerFactory<String, T> producerFactory() {
+	public <T> ProducerFactory<String, T> producerFactory() {
 		Map<String, Object> configProps = new HashMap<>();
 		configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
 		configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
@@ -29,7 +28,7 @@ public class KafkaProducerConfig {
 	}
 
 	@Bean
-	public <T extends DtoEntity> KafkaTemplate<String, T> kafkaTemplate() {
+	public <T> KafkaTemplate<String, T> kafkaTemplate() {
 		return new KafkaTemplate<>(producerFactory());
 	}
 }

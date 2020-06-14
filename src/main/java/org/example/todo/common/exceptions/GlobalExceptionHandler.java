@@ -12,6 +12,7 @@ import org.springframework.web.context.request.WebRequest;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -37,6 +38,7 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<ErrorDetails> globalExceptionHandler(Exception e, WebRequest request) {
 		Throwable throwable = ExceptionUtils.getRootCause(e);
+		//TODO: SQLIntegrityConstraintViolationException
 		if (throwable instanceof ConstraintViolationException) {
 			Set<ConstraintViolation<?>> constraintViolations = ((ConstraintViolationException) throwable).getConstraintViolations();
 			List<String> violationMessages = new ArrayList<>();

@@ -1,6 +1,5 @@
 package org.example.todo.common.util;
 
-import org.example.todo.common.dto.DtoEntity;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.data.domain.Page;
@@ -20,7 +19,7 @@ public final class ResponseUtils {
 		throw new IllegalStateException("Utility class");
 	}
 
-	public static <R, T extends DtoEntity> ResponseContainer<T> pageToDtoResponseContainer(Page<R> page, Class<T> clazz) {
+	public static <R, T> ResponseContainer<T> pageToDtoResponseContainer(Page<R> page, Class<T> clazz) {
 		List<R> elements = page.getContent();
 		List<T> dtoElements = convertToDtoList(elements, clazz);
 		ResponseContainer<T> responseContainer = new ResponseContainer<>(true, null, dtoElements);
@@ -33,7 +32,7 @@ public final class ResponseUtils {
 		return responseContainer;
 	}
 
-	public static <R, T extends DtoEntity> ResponseContainer<T> pageToDtoResponseContainer(List<R> elements, Class<T> clazz) {
+	public static <R, T> ResponseContainer<T> pageToDtoResponseContainer(List<R> elements, Class<T> clazz) {
 		List<T> dtoElements = convertToDtoList(elements, clazz);
 		ResponseContainer<T> responseContainer = new ResponseContainer<>(true, null, dtoElements);
 		responseContainer.setTotalElements(dtoElements.size());
@@ -44,13 +43,13 @@ public final class ResponseUtils {
 		return responseContainer;
 	}
 
-	public static <R, T extends DtoEntity> List<T> convertToDtoList(List<R> objects, Class<T> clazz) {
+	public static <R, T> List<T> convertToDtoList(List<R> objects, Class<T> clazz) {
 		return objects.stream()
 				.map(obj -> convertToDto(obj, clazz))
 				.collect(Collectors.toList());
 	}
 
-	public static <R, T extends DtoEntity> T convertToDto(R object, Class<T> clazz) {
+	public static <R, T> T convertToDto(R object, Class<T> clazz) {
 		return modelMapper.map(object, clazz);
 	}
 }
