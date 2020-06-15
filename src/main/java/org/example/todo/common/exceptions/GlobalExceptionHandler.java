@@ -26,7 +26,7 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(ResourceNotFoundException.class)
 	public ResponseEntity<ErrorDetails> resourceNotFoundException(ResourceNotFoundException e, WebRequest request) {
 		ErrorDetails errorDetails = new ErrorDetails(Instant.now().atOffset(ZoneOffset.UTC), e.getMessage(), null, request.getDescription(false));
-		return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+		return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
 	}
 
 	@ExceptionHandler(ImproperResourceSpecification.class)

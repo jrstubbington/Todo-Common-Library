@@ -10,7 +10,7 @@ import java.util.Objects;
 
 @ResponseStatus(value = HttpStatus.BAD_REQUEST)
 @Getter
-public class ImproperResourceSpecification extends Exception {
+public class ImproperResourceSpecification extends RuntimeException {
 
 	private final List<String> details;
 

@@ -49,7 +49,7 @@ class GlobalExceptionHandlerTest {
 
 		when(request.getDescription(false)).thenReturn("This is a test description");
 
-		ResponseEntity<ErrorDetails> errorResponse = ResponseEntity.badRequest().body(new ErrorDetails(Instant.now().atOffset(ZoneOffset.UTC), "Resource Not Found", null, "This is a test description"));
+		ResponseEntity<ErrorDetails> errorResponse = ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorDetails(Instant.now().atOffset(ZoneOffset.UTC), "Resource Not Found", null, "This is a test description"));
 
 		assertEquals(errorResponse, globalExceptionHandler.resourceNotFoundException(exception, request),
 				"Response should match expected format");
