@@ -1,6 +1,8 @@
 package org.example.todo.common.exceptions;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -16,6 +18,8 @@ import java.util.Objects;
 @EqualsAndHashCode
 @ToString
 @Slf4j
+@AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ErrorDetails {
 
 	@EqualsAndHashCode.Exclude
