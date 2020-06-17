@@ -32,7 +32,9 @@ public class KafkaProducer<T> {
 			 method = message.getClass().getMethod("getUuid");
 		}
 		catch (SecurityException | NoSuchMethodException e) {
-			log.error("Unable to find method 'getUuid' from class {}", message.getClass(), e);
+			log.error("Unable to find method 'getUuid' from class {}. " +
+					"Class MUST have a uuid and getter matching 'public UUID getUuid()' to be used with Kafka", message.getClass(), e);
+			return;
 		}
 		try {
 			objectUuid = (UUID) method.invoke(message);
