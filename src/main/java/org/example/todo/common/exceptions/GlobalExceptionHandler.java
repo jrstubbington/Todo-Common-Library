@@ -55,7 +55,7 @@ public class GlobalExceptionHandler {
 			String originalMessage = ((JsonProcessingException) throwable).getOriginalMessage();
 			JsonLocation jsonLocation = ((JsonProcessingException) throwable).getLocation();
 			String errorMessage = String.format("%s at line: %d, column: %d", originalMessage, jsonLocation.getLineNr(), jsonLocation.getColumnNr());
-			return new ResponseEntity<>(new ErrorDetails(Instant.now().atOffset(ZoneOffset.UTC), "JSON Validation Failure", Collections.singletonList(errorMessage), request.getDescription(false)), HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(new ErrorDetails(Instant.now().atOffset(ZoneOffset.UTC), "Validation Failure", Collections.singletonList(errorMessage), request.getDescription(false)), HttpStatus.BAD_REQUEST);
 		}
 		else if (throwable instanceof IllegalArgumentException) {
 			log.debug("IllegalArgumentException", e);
