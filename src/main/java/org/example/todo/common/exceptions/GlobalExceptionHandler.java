@@ -49,6 +49,18 @@ public class GlobalExceptionHandler {
 			log.debug("ConstraintViolationException:", e);
 			return new ResponseEntity<>(new ErrorDetails(Instant.now().atOffset(ZoneOffset.UTC), "Cannot save due to specification issues.", violationMessages, request.getDescription(false)), HttpStatus.BAD_REQUEST);
 		}
+		else if (throwable instanceof SQLIntegrityConstraintViolationException) {
+			//Returning a non-200 status code may be a mistake here. This should ONLY be used for internal systems as indicating a resource exists
+			// or not could expose sensitive client information
+			log.debug("SQLIntegrityConstraintViolationException caught", e);
+			if (throwable.getMessage().startsWith("Duplicate entry")) {
+				log.debug("Duplicate entry detected. Throwing 4XX error");
+				return new ResponseEntity<>(new ErrorDetails(Instant.now().atOffset(ZoneOffset.UTC), "Resource Already Exists", Collections.singletonList("The resource you are trying to create already exists"), request.getDescription(false)), HttpStatus.CONFLICT);
+			}
+			else {
+				return return500Error(e, throwable, request);
+			}
+		}
 		//Test if exception is a child class of JsonProcessing Exception, such as JsonParseException or InvalidFormatException
 		else if (JsonProcessingException.class.isAssignableFrom(throwable.getClass())) {
 			log.debug("JsonProcessingException", e);
@@ -63,9 +75,13 @@ public class GlobalExceptionHandler {
 			return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
 		}
 		else {
-			log.error("Caught Unhandled Error {}, with root cause {}", e.getClass(), throwable.getClass(), e);
-			ErrorDetails errorDetails = new ErrorDetails(Instant.now().atOffset(ZoneOffset.UTC), "An Internal Server error has occurred.", null, request.getDescription(false));
-			return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
+			return return500Error(e, throwable, request);
 		}
+	}
+
+	public ResponseEntity<ErrorDetails> return500Error(Exception exception, Throwable throwable, WebRequest request) {
+		log.error("Caught Unhandled Error {}, with root cause {}", exception.getClass(), throwable.getClass(), exception);
+		ErrorDetails errorDetails = new ErrorDetails(Instant.now().atOffset(ZoneOffset.UTC), "An Internal Server error has occurred.", null, request.getDescription(false));
+		return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 }
